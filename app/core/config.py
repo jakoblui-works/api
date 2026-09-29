@@ -1,7 +1,6 @@
-# app/core/config.py
-# app/core/config.py
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy import URL
 
 
 class DatabaseSettings(BaseModel):
@@ -9,11 +8,18 @@ class DatabaseSettings(BaseModel):
     port: int = 5432
     name: str = "site_db"
     user: str = "postgres"
-    password: str = ""
+    password: SecretStr
 
     @property
-    def url(self) -> str:
-        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
+    def url(self) -> URL:
+        return URL.create(
+            drivername="postgresql+asyncpg",
+            username=self.user,
+            password=self.password.get_secret_value(),
+            host=self.host,
+            port=self.port,
+            database=self.name,
+        )
 
 
 class RedisSettings(BaseModel):
@@ -32,11 +38,12 @@ class Settings(BaseSettings):
         env_nested_delimiter="__",
         extra="ignore",
     )
+    log_level: str = "INFO"
 
     app_name: str = "site-api"
     debug: bool = False
 
-    database: DatabaseSettings = DatabaseSettings()
+    database: DatabaseSettings
     redis: RedisSettings = RedisSettings()
     sentry: SentrySettings = SentrySettings()
 
