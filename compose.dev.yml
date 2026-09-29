@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: ${DATABASE__USER:?DATABASE__USER missing}
+      POSTGRES_PASSWORD: ${DATABASE__PASSWORD:?DATABASE__PASSWORD missing}
+      POSTGRES_DB: ${DATABASE__NAME:?DATABASE__NAME missing}
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    ports:
+      - "127.0.0.1:5432:5432"
+volumes:
+  postgres-data:
