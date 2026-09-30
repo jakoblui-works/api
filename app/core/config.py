@@ -1,3 +1,5 @@
+import urllib.parse
+
 from pydantic import BaseModel, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import URL
@@ -25,6 +27,12 @@ class DatabaseSettings(BaseModel):
 class RedisSettings(BaseModel):
     host: str = "localhost"
     port: int = 6379
+    password: SecretStr
+
+    @property
+    def url(self) -> str:
+        password = urllib.parse.quote(self.password.get_secret_value(), safe="")
+        return f"redis://:{password}@{self.host}:{self.port}/0"
 
 
 class SentrySettings(BaseModel):
@@ -44,7 +52,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     database: DatabaseSettings
-    redis: RedisSettings = RedisSettings()
+    redis: RedisSettings
     sentry: SentrySettings = SentrySettings()
 
 
