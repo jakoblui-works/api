@@ -1,11 +1,12 @@
 from collections.abc import AsyncGenerator
-from contextlib import asynccontextmanager
+from contextlib import AsyncExitStack, asynccontextmanager
 
 from fastapi import FastAPI
 
 from app.core.config import settings
 from app.core.database import create_database_engine, create_session_factory
 from app.core.logging import configure_logging
+from app.core.redis import create_redis_client
 from app.core.sentry import init_sentry
 from app.health.router import router as health_router
 
@@ -16,14 +17,16 @@ init_sentry()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
-    engine = create_database_engine(settings.database)
-    factory = create_session_factory(engine)
-    app.state.database_engine = engine
-    app.state.session_factory = factory
-    try:
+    async with AsyncExitStack() as stack:
+        engine = create_database_engine(settings.database)
+        stack.push_async_callback(engine.dispose)
+
+        app.state.database_engine = engine
+        app.state.session_factory = create_session_factory(engine)
+
+        app.state.redis = await stack.enter_async_context(create_redis_client(settings.redis))
+
         yield
-    finally:
-        await engine.dispose()
 
 
 app = FastAPI(lifespan=lifespan)

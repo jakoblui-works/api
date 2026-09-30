@@ -21,11 +21,22 @@ jobs:
           --health-interval 5s
           --health-timeout 3s
           --health-retries 10
+      redis:
+        image: redis:8.10
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     env:
       DATABASE__HOST: localhost
       DATABASE__USER: postgres
       DATABASE__PASSWORD: postgres
       DATABASE__NAME: site_db
+      REDIS__HOST: localhost
+      REDIS__PASSWORD: ""
     steps:
       - uses: actions/checkout@v7
       - name: Install the latest version of uv

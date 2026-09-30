@@ -9,5 +9,18 @@ services:
       - postgres-data:/var/lib/postgresql
     ports:
       - "127.0.0.1:5432:5432"
+  redis:
+    image: redis:8.10
+    command: >
+      redis-server 
+      --requirepass ${REDIS__PASSWORD:?REDIS__PASSWORD missing}
+      --appendonly yes 
+      --maxmemory 256mb 
+      --maxmemory-policy volatile-lru
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
 volumes:
   postgres-data:
+  redis-data:
