@@ -7,40 +7,22 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:18
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: site_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d site_db"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
-      redis:
-        image: redis:8.10
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
     env:
       DATABASE__HOST: localhost
       DATABASE__USER: postgres
       DATABASE__PASSWORD: postgres
       DATABASE__NAME: site_db
       REDIS__HOST: localhost
-      REDIS__PASSWORD: ""
+      REDIS__PASSWORD: dev
+      S3__ACCESS_KEY_ID: GK3034edd8dc6fd1fd46c3ef25
+      S3__SECRET_ACCESS_KEY: 62baee66f3c5526c5f47fa5b9379ee25609c13dde3837ace75bf833aaac717a4
+      S3__BUCKET: bucket
     steps:
       - uses: actions/checkout@v7
       - name: Install the latest version of uv
         uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4
-      - run: uv sync
+      - run: docker compose -f compose.dev.yml up -d --wait
+      - run: ./scripts/garage-dev-init.sh
+      - run: uv sync --locked
       - run: uv run ruff check
       - run: uv run pytest

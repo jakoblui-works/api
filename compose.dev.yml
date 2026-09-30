@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:18
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${DATABASE__USER:?DATABASE__USER missing}
       POSTGRES_PASSWORD: ${DATABASE__PASSWORD:?DATABASE__PASSWORD missing}
@@ -9,8 +10,18 @@ services:
       - postgres-data:/var/lib/postgresql
     ports:
       - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 30s
+      start_period: 20s
+      start_interval: 2s
+      timeout: 3s
+      retries: 3
   redis:
     image: redis:8.10
+    restart: unless-stopped
+    environment:
+      REDISCLI_AUTH: ${REDIS__PASSWORD:?REDIS__PASSWORD missing}
     command: >
       redis-server 
       --requirepass ${REDIS__PASSWORD:?REDIS__PASSWORD missing}
@@ -21,6 +32,33 @@ services:
       - "127.0.0.1:6379:6379"
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
+      interval: 30s
+      start_period: 20s
+      start_interval: 2s
+      timeout: 3s
+      retries: 3
+  s3:
+    image: dxflrs/garage:v2.4.1
+    restart: unless-stopped
+    environment:
+      GARAGE_RPC_SECRET: 53f94965c264e0f12ce4be3dd7e7de65bf0dd8e423e611ec9d690dabc573313d
+    ports: ["127.0.0.1:3900:3900"]
+    volumes:
+      - ./dev/garage.toml:/etc/garage.toml:ro
+      - garage-meta:/var/lib/garage/meta
+      - garage-data:/var/lib/garage/data
+    healthcheck:
+      test: ["CMD", "/garage", "status"]
+      interval: 30s
+      start_period: 20s
+      start_interval: 2s
+      timeout: 3s
+      retries: 3
+
 volumes:
   postgres-data:
   redis-data:
+  garage-meta:
+  garage-data:
