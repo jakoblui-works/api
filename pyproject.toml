@@ -31,3 +31,6 @@ target-version = "py313"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]  # errors, pyflakes, import sorting — a reasonable starting set
+
+[tool.ruff.lint.per-file-ignores]
+"migrations/versions/*" = ["F401"]
