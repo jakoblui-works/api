@@ -40,11 +40,20 @@ class SentrySettings(BaseModel):
     environment: str = "development"
 
 
+class S3Settings(BaseModel):
+    endpoint_url: str = "http://localhost:3900"
+    region: str = "garage"
+    access_key_id: str
+    secret_access_key: SecretStr
+    bucket: str
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_nested_delimiter="__",
         extra="ignore",
+        hide_input_in_errors=True,
     )
     log_level: str = "INFO"
 
@@ -53,6 +62,7 @@ class Settings(BaseSettings):
 
     database: DatabaseSettings
     redis: RedisSettings
+    s3: S3Settings
     sentry: SentrySettings = SentrySettings()
 
 
