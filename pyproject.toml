@@ -13,6 +13,8 @@ dependencies = [
     "redis>=8.1.0",
     "sentry-sdk[fastapi]>=2.69.2",
     "sqlalchemy[asyncio]>=2.0.54",
+    "taskiq>=0.13.0",
+    "taskiq-redis>=1.2.4",
     "types-aioboto3[s3]>=15.5",
     "uvicorn[standard]>=0.53.0",
 ]
@@ -34,6 +36,7 @@ target-version = "py313"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]  # errors, pyflakes, import sorting — a reasonable starting set
+extend-select = ["ANN"]
 
 [tool.ruff.lint.per-file-ignores]
 "migrations/versions/*" = ["F401"]

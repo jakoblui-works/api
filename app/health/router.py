@@ -13,13 +13,13 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/health", response_model=StatusResponse)
-async def health_check():
-    return {"status": "ok"}
+@router.get("/health")
+async def health_check() -> StatusResponse:
+    return StatusResponse(status="ok")
 
 
-@router.get("/health/ready", response_model=StatusResponse)
-async def ready_check(session: SessionDep, redis: RedisDep, s3: S3Dep):
+@router.get("/health/ready")
+async def ready_check(session: SessionDep, redis: RedisDep, s3: S3Dep) -> StatusResponse:
 
     await check_readiness(
         session=session,
@@ -27,4 +27,4 @@ async def ready_check(session: SessionDep, redis: RedisDep, s3: S3Dep):
         s3=s3,
     )
 
-    return {"status": "ok"}
+    return StatusResponse(status="ok")
