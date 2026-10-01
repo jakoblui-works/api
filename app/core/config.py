@@ -66,4 +66,4 @@ class Settings(BaseSettings):
     sentry: SentrySettings = SentrySettings()
 
 
-settings = Settings()
+settings = Settings()  # pyright: ignore[reportCallIssue]  # required fields are loaded from the environment

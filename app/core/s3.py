@@ -2,7 +2,7 @@ from contextlib import AbstractAsyncContextManager
 from typing import Annotated
 
 import aioboto3
-from botocore.config import Config
+from aiobotocore.config import AioConfig
 from fastapi import Depends, Request
 from types_aiobotocore_s3 import S3Client
 
@@ -16,7 +16,7 @@ def create_s3_client(settings: S3Settings, session: aioboto3.Session) -> Abstrac
         region_name=settings.region,
         aws_access_key_id=settings.access_key_id,
         aws_secret_access_key=settings.secret_access_key.get_secret_value(),
-        config=Config(
+        config=AioConfig(
             request_checksum_calculation="when_required",
             s3={"addressing_style": "path"},
         ),
