@@ -26,10 +26,19 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "ruff>=0.16.8",
 ]
+
+[tool.uv]
+required-version = ">=0.12.21"
+
 [tool.pytest.ini_options]
 markers = [
     "covers_endpoint(name): mark a test as covering a specific route by its FastAPI route name",
 ]
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "--import-mode=importlib"
+pythonpath = ["."]
+
 [tool.ruff]
 line-length = 120
 target-version = "py313"

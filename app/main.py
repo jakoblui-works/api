@@ -12,6 +12,7 @@ from app.core.redis import create_redis_client
 from app.core.s3 import create_s3_client
 from app.core.sentry import init_sentry
 from app.cv.client import CvClient
+from app.cv.router import router as cv_router
 from app.health.router import router as health_router
 
 configure_logging(settings.log_level)
@@ -52,3 +53,4 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(health_router)
+app.include_router(cv_router)
