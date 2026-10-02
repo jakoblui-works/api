@@ -23,9 +23,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push
         run: |
-          docker build -t ghcr.io/jakoblui-works/site-api:${{ github.sha }} -t ghcr.io/jakoblui-works/site-api:latest .
-          docker push ghcr.io/jakoblui-works/site-api:${{ github.sha }}
-          docker push ghcr.io/jakoblui-works/site-api:latest
+          docker build -t ghcr.io/jakoblui-works/api:${{ github.sha }} -t ghcr.io/jakoblui-works/api:latest .
+          docker push ghcr.io/jakoblui-works/api:${{ github.sha }}
+          docker push ghcr.io/jakoblui-works/api:latest
       - name: Trigger deploy
         env:
           GH_TOKEN: ${{ secrets.DEPLOY_REPO_DISPATCH_TOKEN }}
