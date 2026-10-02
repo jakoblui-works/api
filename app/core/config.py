@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     )
     log_level: str = "INFO"
 
-    app_name: str = "site-api"
+    app_name: str = "api"
     debug: bool = False
 
     database: DatabaseSettings
