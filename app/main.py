@@ -50,7 +50,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
         yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan,
+    generate_unique_id_function=lambda route: route.name,
+)
 
 app.include_router(health_router)
 app.include_router(cv_router)
