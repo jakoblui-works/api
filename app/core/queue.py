@@ -27,9 +27,9 @@ class ServiceClient:
     def _kicker(self, task_name: str) -> AsyncKicker:
         return AsyncKicker(task_name=task_name, broker=self._broker, labels={})
 
-    async def _send(self, task_name: str, *args: object) -> str:
+    async def _send(self, task_name: str, *args: object, task_id: str | None = None) -> str:
         """Enqueue a task and return its ID without waiting."""
-        task = await self._kicker(task_name).kiq(*args)
+        task = await self._kicker(task_name).with_task_id(task_id).kiq(*args)
         return task.task_id
 
     async def _call(self, task_name: str, *args: object, timeout: float = 10) -> object:

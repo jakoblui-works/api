@@ -76,3 +76,34 @@ async def test_service_client_status_pending(broker: InMemoryBroker) -> None:
 
     assert task_result.state == "pending"
     assert task_result.result is None
+
+
+@pytest.mark.asyncio
+async def test_service_client_send_uses_given_task_id(broker: InMemoryBroker) -> None:
+    @broker.task(task_name="test.echo")
+    async def mock_echo(value: str) -> str:
+        return value
+
+    client = ServiceClient(broker)
+
+    task_id = await client._send("test.echo", "hello", task_id="chosen-id")
+
+    task_result = await wait_until_finished(client, "chosen-id")
+
+    assert task_id == "chosen-id"
+    assert task_result.state == "done"
+    assert task_result.result == "hello"
+
+
+@pytest.mark.asyncio
+async def test_service_client_send_generates_distinct_task_ids(broker: InMemoryBroker) -> None:
+    @broker.task(task_name="test.noop")
+    async def mock_noop() -> None:
+        return None
+
+    client = ServiceClient(broker)
+
+    first = await client._send("test.noop")
+    second = await client._send("test.noop")
+
+    assert first != second

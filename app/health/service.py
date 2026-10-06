@@ -25,4 +25,4 @@ async def _check(name: str, probe: Awaitable[object]) -> None:
 async def check_readiness(session: AsyncSession, redis: Redis, s3: S3Client) -> None:
     await _check("Database", session.execute(text("SELECT 1")))
     await _check("Redis", redis.ping())
-    await _check("S3", s3.head_bucket(Bucket=settings.s3.bucket))
+    await _check("S3", s3.head_bucket(Bucket=settings.cv.bucket))
