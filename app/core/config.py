@@ -45,6 +45,9 @@ class S3Settings(BaseModel):
     region: str = "garage"
     access_key_id: str
     secret_access_key: SecretStr
+
+
+class CvSettings(BaseModel):
     bucket: str
 
 
@@ -63,6 +66,7 @@ class Settings(BaseSettings):
     database: DatabaseSettings
     redis: RedisSettings
     s3: S3Settings
+    cv: CvSettings
     sentry: SentrySettings = SentrySettings()
 
 

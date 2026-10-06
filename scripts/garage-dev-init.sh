@@ -14,5 +14,5 @@ if [[ $layout == *"Current cluster layout version: 0"* ]]; then
 fi
 
 s3 key import --yes "$S3__ACCESS_KEY_ID" "$S3__SECRET_ACCESS_KEY" -n api || true
-s3 bucket create "$S3__BUCKET" || true
-s3 bucket allow --read --write "$S3__BUCKET" --key "$S3__ACCESS_KEY_ID"
+s3 bucket create "$CV__BUCKET" || true
+s3 bucket allow --read --write "$CV__BUCKET" --key "$S3__ACCESS_KEY_ID"

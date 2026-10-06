@@ -16,7 +16,7 @@ jobs:
       REDIS__PASSWORD: dev
       S3__ACCESS_KEY_ID: GK3034edd8dc6fd1fd46c3ef25
       S3__SECRET_ACCESS_KEY: 62baee66f3c5526c5f47fa5b9379ee25609c13dde3837ace75bf833aaac717a4
-      S3__BUCKET: bucket
+      CV__BUCKET: bucket
     steps:
       - uses: actions/checkout@v7
       - name: Install the latest version of uv
