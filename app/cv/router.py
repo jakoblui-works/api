@@ -5,6 +5,7 @@ from fastapi import APIRouter, Path, Response
 from app.core.database import SessionDep
 from app.core.redis import RedisDep
 from app.core.s3 import S3Dep
+from app.core.schemas import ErrorResponse
 from app.cv.client import CvClientDep
 from app.cv.schemas import (
     DIGEST_PATTERN,
@@ -46,7 +47,10 @@ async def cv_get_pdf(digest: Digest, s3: S3Dep) -> Response:
     return Response(content=pdf, media_type="application/pdf")
 
 
-@router.get("/options")
+@router.get(
+    "/options",
+    responses={503: {"model": ErrorResponse, "description": "No CV options have been published yet"}},
+)
 async def cv_get_options(session: SessionDep) -> FormOptionsResponse:
     return await get_form_options(session)
 

@@ -6,6 +6,7 @@ import pytest
 from httpx import AsyncClient
 
 from app.core.s3 import get_s3
+from app.core.schemas import ErrorResponse
 from app.cv.schemas import FormOptionsResponse
 from app.main import app
 from tests.cv.conftest import FakeGenerateWorker, key_for
@@ -136,6 +137,14 @@ async def test_cv_get_options_unpublished(client: AsyncClient) -> None:
     response = await client.get("/cv/options")
 
     assert response.status_code == 503
+    ErrorResponse.model_validate(response.json())
+
+
+def test_cv_get_options_declares_503_in_spec() -> None:
+    responses = app.openapi()["paths"]["/cv/options"]["get"]["responses"]
+
+    assert "503" in responses
+    assert "$ref" in responses["503"]["content"]["application/json"]["schema"]
 
 
 @pytest.mark.covers_endpoint("cv_generate")
