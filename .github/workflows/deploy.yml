@@ -13,6 +13,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      statuses: write
     steps:
       - uses: actions/checkout@v7
       - name: Log in to ghcr.io
@@ -26,8 +27,17 @@ jobs:
           docker build -t ghcr.io/jakoblui-works/api:${{ github.sha }} -t ghcr.io/jakoblui-works/api:latest .
           docker push ghcr.io/jakoblui-works/api:${{ github.sha }}
           docker push ghcr.io/jakoblui-works/api:latest
+      # infra replaces this with the deploy's result, on this commit.
+      - name: Mark the commit as waiting to deploy
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --silent "repos/$GITHUB_REPOSITORY/statuses/$GITHUB_SHA" \
+            -f state=pending -f context=deploy -f description="Waiting to deploy"
       - name: Trigger deploy
         env:
           GH_TOKEN: ${{ secrets.DEPLOY_REPO_DISPATCH_TOKEN }}
         run: |
-          gh api repos/jakoblui-works/infra/dispatches -f event_type=deploy
+          gh api repos/jakoblui-works/infra/dispatches -f event_type=deploy \
+            -f 'client_payload[repo]=api' -f "client_payload[sha]=$GITHUB_SHA"
