@@ -8,4 +8,5 @@ def init_sentry() -> None:
         dsn=settings.sentry.dsn,
         environment=settings.sentry.environment,
         traces_sample_rate=1.0,
+        include_local_variables=False,  # Tracebacks would carry request data (bodies, ids) into Sentry.
     )
