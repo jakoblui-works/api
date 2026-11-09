@@ -4,7 +4,7 @@ Shared FastAPI gateway for all jakoblui-works projects. Served behind Traefik at
 
 ## Commands
 ```sh
-docker compose -f compose.dev.yml up -d --wait   # Postgres 18, Redis 8.10, Garage
+docker compose -f compose.dev.yml up -d --wait   # Postgres, Redis, Garage
 ./scripts/garage-dev-init.sh                     # one-time Garage layout/key/bucket setup
 uv sync
 uv run ruff check && uv run ruff format --check
@@ -15,10 +15,10 @@ uv run uvicorn app.main:app --reload             # http://localhost:8000
 Local DB shell (no `psql` on the host): `docker exec api-postgres-1 psql -U works_user -d jakoblui_works`
 
 ## Layout
-`app/<domain>/` = `router.py` / `service.py` / `repository.py` / `schemas.py` (+ `client.py` for worker calls). Routes only wire dependencies; logic goes in the service; SQL/Redis/S3 goes in the repository (no HTTP, no pydantic).
+`app/<domain>/`: one module per domain, laid out as `platform-docs/conventions.md` ("Module layout") says.
 - `app/core/`: settings, database, Redis, S3, Sentry, `ServiceClient` (Taskiq sender, supports a caller-chosen `task_id`).
-- `app/health/`: liveness/readiness (readiness heads `settings.cv.bucket`).
-- `app/cv/`: options, generate (dedup via Redis claim/release), status, PDF.
+- `app/health/`: liveness and readiness.
+- `app/cv/`: options, generate, status, PDF.
 
 ## Contracts
 - **Consumes** `cv.published_options` (owned by cv-service): plain SQL plus mirror models in `app/cv/schemas.py`. Field names are the contract; class names are ours. Never migrate the `cv` schema from here.
